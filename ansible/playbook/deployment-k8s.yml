@@ -1,0 +1,18 @@
+- hosts:
+  - all
+  tasks:
+  - name: Copy docker compose file to grand master
+    copy:
+      src: "{{ workspace }}/k8s/deploy-1.yml"
+      dest: /home/ubuntu/deploy-1.yml
+    copy:
+      src: "{{ workspace }}/k8s/service-1.yml"
+      dest: /home/ubuntu/service-1.yml
+  - name: get login credentials for ecr
+    shell: "export PATH=$PATH:/usr/local/bin/ && aws ecr get-login-password --region {{ aws_region }} | docker login --username AWS --password-stdin {{ ecr_registry }}"
+
+  - name: deploy the app k8s
+    shell: "kubectl apply -f ."
+    register: output
+
+  - debug: msg="{{ output.stdout }}"
