@@ -50,6 +50,16 @@ pipeline {
                 sh "docker push ${IMAGE_TAG}"
             }
         }
+
+    stage('Ansible test kubernetes'){
+            steps {
+                echo 'PINGGGGGGGGGG'
+          
+                sh 'ansible-playbook -i ./ansible/inventory/dynamic_inv_aws_ec2.yml -b ./ansible/playbook/ping-all.yml'
+            }
+        }
+
+
     }
     post {
         always {
