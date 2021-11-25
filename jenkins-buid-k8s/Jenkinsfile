@@ -9,7 +9,7 @@ pipeline {
         AWS_REGION="us-east-1"
         ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
         
-        ANSIBLE_PRIVATE_KEY_FILE="${WORKSPACE}/${CFN_KEYPAIR}"
+        ANSIBLE_PRIVATE_KEY_FILE="${WORKSPACE}/ec2_key_win.txt"
         ANSIBLE_HOST_KEY_CHECKING="False"
     }
     stages {
