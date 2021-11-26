@@ -8,7 +8,7 @@ pipeline {
         AWS_ACCOUNT_ID=sh(script:'export PATH="$PATH:/usr/local/bin" && aws sts get-caller-identity --query Account --output text', returnStdout:true).trim()
         AWS_REGION="us-east-1"
         ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-        TOKEN=sh(script:'export PATH="$PATH:/usr/local/bin" && aws ecr --region=$AWS_REGION get-authorization-token --output text --query authorizationData[].authorizationToken | base64 -d | cut -d: -f2', returnStdout:true)
+        TOKEN=sh(script:'export PATH="$PATH:/usr/local/bin" && aws ecr --region=us-east-1 get-authorization-token --output text --query authorizationData[].authorizationToken | base64 -d | cut -d: -f2', returnStdout:true)
         SECRET_NAME="${AWS_ACCOUNT_ID}-ecr-registry"
         ANSIBLE_PRIVATE_KEY_FILE="${WORKSPACE}/ec2_key_win.txt"
         ANSIBLE_HOST_KEY_CHECKING="False"
