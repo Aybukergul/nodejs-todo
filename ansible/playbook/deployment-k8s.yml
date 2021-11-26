@@ -8,11 +8,14 @@
     copy:
       src: "{{ workspace }}/k8s/service-1.yml"
       dest: /home/ubuntu/service-1.yml
-  - name: get login credentials for ecr
-    shell: "export PATH=$PATH:/usr/local/bin/ && aws ecr get-login-password --region {{ aws_region }} | docker login --username AWS --password-stdin {{ ecr_registry }}"
 
-   
-  - name: deploy the app k8s
+  - name: get login credentials for ecr
+    shell: kubectl --kubeconfig=/home/ubuntu/.kube/config create secret docker-registry ${{ secret_name }} --docker-server=https://${{ account }}.dkr.ecr.${{ aws_region }}.amazonaws.com --docker-username={{ account }} --docker-password="${{ token }}" --docker-email="kocagoz@gmail.com"
+
+  - name: k8s create secret
+    shell: kubectl --kubeconfig=/home/ubuntu/.kube/config create secret docker-registry ${{ secret_name }} --docker-server=https://${{ account }}.dkr.ecr.${{ aws_region }}.amazonaws.com --docker-username=${{ account }} --docker-password="${{ token }}" --docker-email="kocagoz@gmail.com"    
+  
+ - name: deploy the app k8s
     shell: "kubectl --kubeconfig=/home/ubuntu/.kube/config apply -f ."
     register: output
 

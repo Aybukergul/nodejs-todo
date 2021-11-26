@@ -8,7 +8,8 @@ pipeline {
         AWS_ACCOUNT_ID=sh(script:'export PATH="$PATH:/usr/local/bin" && aws sts get-caller-identity --query Account --output text', returnStdout:true).trim()
         AWS_REGION="us-east-1"
         ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-        
+        TOKEN="aws ecr --region=${AWS_REGION} get-authorization-token --output text --query authorizationData[].authorizationToken | base64 -d | cut -d: -f2"
+        SECRET_NAME="${AWS_ACCOUNT_ID}-ecr-registry"
         ANSIBLE_PRIVATE_KEY_FILE="${WORKSPACE}/ec2_key_win.txt"
         ANSIBLE_HOST_KEY_CHECKING="False"
     }
@@ -56,7 +57,7 @@ pipeline {
                 echo 'PINGGGGGGGGGG'
                     sh 'envsubst < ./k8s/deploy-1.yml > ./k8s/deploy-1-tagged.yml'
                 sh 'ansible-playbook -i ./ansible/inventory/dynamic_inv_aws_ec2.yml -b ./ansible/playbook/ping-all.yml'
-                 sh 'ansible-playbook -i ./ansible/inventory/dynamic_inv_aws_ec2.yml -b --extra-vars "workspace=${WORKSPACE} app_name=${APP_NAME} aws_region=${AWS_REGION} ecr_registry=${ECR_REGISTRY}" ./ansible/playbook/deployment-k8s.yml'
+                 sh 'ansible-playbook -i ./ansible/inventory/dynamic_inv_aws_ec2.yml -b --extra-vars "workspace=${WORKSPACE} app_name=${APP_NAME} aws_region=${AWS_REGION} secret_name=${SECRET_NAME}  ecr_registry=${ECR_REGISTRY} token=${TOKEN} account=${AWS_ACCOUNT_ID} " ./ansible/playbook/deployment-k8s.yml'
                 
 
             }
