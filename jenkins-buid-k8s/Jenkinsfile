@@ -54,9 +54,11 @@ pipeline {
     stage('Ansible test kubernetes'){
             steps {
                 echo 'PINGGGGGGGGGG'
-          
+                    sh 'envsubst < ./k8s/deploy-1.yml > depoy-1-tagged.yml'
                 sh 'ansible-playbook -i ./ansible/inventory/dynamic_inv_aws_ec2.yml -b ./ansible/playbook/ping-all.yml'
-                 sh 'ansible-playbook -i ./ansible/inventory/dynamic_inv_aws_ec2.yml -b ./ansible/playbook/deployment-k8s.yml'
+                 sh 'ansible-playbook -i ./ansible/inventory/dynamic_inv_aws_ec2.yml -b --extra-vars "workspace=${WORKSPACE} app_name=${APP_NAME} aws_region=${AWS_REGION} ecr_registry=${ECR_REGISTRY}" ./ansible/playbook/deployment-k8s.yml'
+                
+
             }
         }
 
@@ -66,7 +68,8 @@ pipeline {
         always {
             echo 'Deleting all local images'
             sh 'docker image prune -af'
-
+            echo 'Tear down the Docker Swarm infrastructure using AWS CLI'
+            sh "aws cloudformation delete-stack --region ${AWS_REGION} --stack-name ${APP_STACK_NAME}"
            
         }
     }

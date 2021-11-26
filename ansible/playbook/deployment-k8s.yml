@@ -2,8 +2,8 @@
   tasks:
   - name: Copy docker compose file to grand master
     copy:
-      src: "{{ workspace }}/k8s/deploy-1.yml"
-      dest: /home/ubuntu/deploy-1.yml
+      src: "{{ workspace }}/k8s/deploy-1-tagged.yml"
+      dest: /home/ubuntu/deploy-1-tagged.yml
   - name: Copy docker compose file to grand master
     copy:
       src: "{{ workspace }}/k8s/service-1.yml"

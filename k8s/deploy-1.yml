@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: todo-pod
-        image: 935026556399.dkr.ecr.us-east-1.amazonaws.com/case-repo/todo-app-dev:todo-${BUILD_NUMBER}
+        image: "${IMAGE_TAG}"
         ports:
         - containerPort: 3000
         imagePullPolicy: Never
