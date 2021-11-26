@@ -23,4 +23,5 @@ spec:
         image: "${IMAGE_TAG}"
         ports:
         - containerPort: 3000
-      imagePullSecrets: 935026556399-ecr-registry
+      imagePullSecrets:
+      - name: 935026556399-ecr-registry
