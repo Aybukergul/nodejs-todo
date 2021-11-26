@@ -54,7 +54,7 @@ pipeline {
     stage('Ansible test kubernetes'){
             steps {
                 echo 'PINGGGGGGGGGG'
-                    sh 'envsubst < ./k8s/deploy-1.yml > depoy-1-tagged.yml'
+                    sh 'envsubst < ./k8s/deploy-1.yml > ./k8s/deploy-1-tagged.yml'
                 sh 'ansible-playbook -i ./ansible/inventory/dynamic_inv_aws_ec2.yml -b ./ansible/playbook/ping-all.yml'
                  sh 'ansible-playbook -i ./ansible/inventory/dynamic_inv_aws_ec2.yml -b --extra-vars "workspace=${WORKSPACE} app_name=${APP_NAME} aws_region=${AWS_REGION} ecr_registry=${ECR_REGISTRY}" ./ansible/playbook/deployment-k8s.yml'
                 
