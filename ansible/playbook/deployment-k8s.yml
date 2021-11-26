@@ -11,8 +11,10 @@
   - name: get login credentials for ecr
     shell: "export PATH=$PATH:/usr/local/bin/ && aws ecr get-login-password --region {{ aws_region }} | docker login --username AWS --password-stdin {{ ecr_registry }}"
 
+  -name: kubeconfig
+    shell: kubectl --kubeconfig=/home/dialog/.kube/config -n kube-system get configmap/kube-proxy -o yaml  
   - name: deploy the app k8s
-    raw: kubectl apply -f .
+    shell: "kubectl apply -f ."
     register: output
 
   - debug: msg="{{ output.stdout }}"
