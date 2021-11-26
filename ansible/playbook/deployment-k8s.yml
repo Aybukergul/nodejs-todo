@@ -13,7 +13,7 @@
 
    
   - name: deploy the app k8s
-    shell: "kubectl --kubeconfig=~/.kube/config apply -f ."
+    shell: "kubectl --kubeconfig=/home/ubuntu/.kube/config apply -f ."
     register: output
 
   - debug: msg="{{ output.stdout }}"
