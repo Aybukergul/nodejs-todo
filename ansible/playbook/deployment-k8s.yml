@@ -8,8 +8,10 @@
     copy:
       src: "{{ workspace }}/k8s/service-1.yml"
       dest: /home/ubuntu/service-1.yml
-
-  - name: get login credentials for ecr
+  - name: delete old secret
+    shell: "kubectl --kubeconfig=/home/ubuntu/.kube/config delete secret --ignore-not-found {{ secret_name }}"
+  
+    - name: get login credentials for ecr
     shell: "kubectl --kubeconfig=/home/ubuntu/.kube/config create secret docker-registry {{ secret_name }} --docker-server=https://{{ account }}.dkr.ecr.{{ aws_region }}.amazonaws.com --docker-username={{ account }} --docker-password={{ token }} --docker-email=kocagoz@gmail.com"
 
   - name: deploy the app k8s
