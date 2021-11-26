@@ -23,5 +23,4 @@ spec:
         image: "${IMAGE_TAG}"
         ports:
         - containerPort: 3000
-        imagePullPolicy: Never
-      restartPolicy: Always
+     
