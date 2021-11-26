@@ -12,7 +12,7 @@
     shell: "export PATH=$PATH:/usr/local/bin/ && aws ecr get-login-password --region {{ aws_region }} | docker login --username AWS --password-stdin {{ ecr_registry }}"
 
   - name: deploy the app k8s
-    shell: "kubectl apply -f ."
+    raw: kubectl apply -f .
     register: output
 
   - debug: msg="{{ output.stdout }}"
