@@ -10,5 +10,6 @@ spec:
   - name: htttp  
     port: 80        
     targetPort: 3000
+    protocol: TCP
   selector:
     app: todo-app
