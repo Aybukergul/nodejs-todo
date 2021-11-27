@@ -14,26 +14,26 @@ pipeline {
         ANSIBLE_HOST_KEY_CHECKING="False"
     }
     stages {
-        stage('Create ECR Repo') {
-            steps {
-                // echo "Creating ECR Repo for ${APP_NAME} app"
-                // sh """
-                // aws ecr create-repository \
-                //     --repository-name ${APP_REPO_NAME} \
-                //     --image-scanning-configuration scanOnPush=false \
-                //     --image-tag-mutability MUTABLE \
-                //     --region ${AWS_REGION}
-                // """
-            }
-        }
+        // stage('Create ECR Repo') {
+        //     steps {
+        //         echo "Creating ECR Repo for ${APP_NAME} app"
+        //         sh """
+        //         aws ecr create-repository \
+        //             --repository-name ${APP_REPO_NAME} \
+        //             --image-scanning-configuration scanOnPush=false \
+        //             --image-tag-mutability MUTABLE \
+        //             --region ${AWS_REGION}
+        //         """
+        //     }
+        // }
 
         stage('Prepare Tags for Docker Images') {
             steps {
                 echo 'Preparing Tags for Docker Images'
                 script {
-                    
+
                     env.IMAGE_TAG="${ECR_REGISTRY}/${APP_REPO_NAME}:todo-b${BUILD_NUMBER}"
-                
+
                 }
             }
         }
@@ -47,7 +47,7 @@ pipeline {
         stage('Push Images to ECR Repo') {
             steps {
                 echo "Pushing ${APP_NAME} App Images to ECR Repo"
-                sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}" 
+                sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
                 sh "docker push ${IMAGE_TAG}"
             }
         }
@@ -58,7 +58,7 @@ pipeline {
                     sh 'envsubst < ./k8s/deploy-1.yml > ./k8s/deploy-1-tagged.yml'
                     sh 'ansible-playbook -i ./ansible/inventory/dynamic_inv_aws_ec2.yml -b ./ansible/playbook/ping-all.yml'
                     sh 'ansible-playbook -i ./ansible/inventory/dynamic_inv_aws_ec2.yml -b --extra-vars "workspace=${WORKSPACE} app_name=${APP_NAME} aws_region=${AWS_REGION} secret_name=${SECRET_NAME}  ecr_registry=${ECR_REGISTRY} token=${TOKEN} account=${AWS_ACCOUNT_ID} " ./ansible/playbook/deployment-k8s.yml'
-                
+
 
             }
         }
@@ -69,7 +69,7 @@ pipeline {
         always {
             echo 'Deleting all local images'
             sh 'docker image prune -af'
-    
+
             //  echo 'Delete the Image Repository on ECR'
             // sh """
             //     aws ecr delete-repository \
@@ -77,7 +77,7 @@ pipeline {
             //       --region ${AWS_REGION}\
             //       --force
             //     """
-           
+
         }
     }
 }
