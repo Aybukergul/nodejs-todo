@@ -5,11 +5,10 @@ metadata:
   labels:
     app: todo-flask
 spec:
-  type: LoadBalancer 
+  type: NodePort 
   ports:
-  - name: htttp  
+  - nodePort: 30336  
     port: 80        
     targetPort: 3000
-    protocol: TCP
   selector:
     app: todo-app
