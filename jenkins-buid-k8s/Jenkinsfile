@@ -16,14 +16,14 @@ pipeline {
     stages {
         stage('Create ECR Repo') {
             steps {
-                echo "Creating ECR Repo for ${APP_NAME} app"
-                sh """
-                aws ecr create-repository \
-                    --repository-name ${APP_REPO_NAME} \
-                    --image-scanning-configuration scanOnPush=false \
-                    --image-tag-mutability MUTABLE \
-                    --region ${AWS_REGION}
-                """
+                // echo "Creating ECR Repo for ${APP_NAME} app"
+                // sh """
+                // aws ecr create-repository \
+                //     --repository-name ${APP_REPO_NAME} \
+                //     --image-scanning-configuration scanOnPush=false \
+                //     --image-tag-mutability MUTABLE \
+                //     --region ${AWS_REGION}
+                // """
             }
         }
 
@@ -56,8 +56,8 @@ pipeline {
             steps {
                 echo 'PINGGGGGGGGGG'
                     sh 'envsubst < ./k8s/deploy-1.yml > ./k8s/deploy-1-tagged.yml'
-                sh 'ansible-playbook -i ./ansible/inventory/dynamic_inv_aws_ec2.yml -b ./ansible/playbook/ping-all.yml'
-                 sh 'ansible-playbook -i ./ansible/inventory/dynamic_inv_aws_ec2.yml -b --extra-vars "workspace=${WORKSPACE} app_name=${APP_NAME} aws_region=${AWS_REGION} secret_name=${SECRET_NAME}  ecr_registry=${ECR_REGISTRY} token=${TOKEN} account=${AWS_ACCOUNT_ID} " ./ansible/playbook/deployment-k8s.yml'
+                    sh 'ansible-playbook -i ./ansible/inventory/dynamic_inv_aws_ec2.yml -b ./ansible/playbook/ping-all.yml'
+                    sh 'ansible-playbook -i ./ansible/inventory/dynamic_inv_aws_ec2.yml -b --extra-vars "workspace=${WORKSPACE} app_name=${APP_NAME} aws_region=${AWS_REGION} secret_name=${SECRET_NAME}  ecr_registry=${ECR_REGISTRY} token=${TOKEN} account=${AWS_ACCOUNT_ID} " ./ansible/playbook/deployment-k8s.yml'
                 
 
             }
