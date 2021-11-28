@@ -1,13 +1,14 @@
 - hosts: all
   tasks:
-  - name: Copy docker compose file to grand master
+  - name: Copy deployment file to  master
     copy:
       src: "{{ workspace }}/k8s/deploy-1-tagged.yml"
       dest: /home/ubuntu/deploy-1-tagged.yml
-  - name: Copy docker compose file to grand master
+  - name: Copy deployment file to  master
     copy:
       src: "{{ workspace }}/k8s/service-1.yml"
       dest: /home/ubuntu/service-1.yml
+  
   - name: delete old secret
     shell: "kubectl --kubeconfig=/home/ubuntu/.kube/config delete secret --ignore-not-found {{ secret_name }}"
   

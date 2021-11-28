@@ -1,29 +1,29 @@
 pipeline {
     agent any
     environment {
-        PATH=sh(script:"echo $PATH:/usr/local/bin", returnStdout:true).trim()
-        APP_NAME="todo"
-        APP_STACK_NAME="node-${APP_NAME}-app-${BUILD_NUMBER}"
-        APP_REPO_NAME="case-repo/${APP_NAME}-app-dev"
-        AWS_ACCOUNT_ID=sh(script:'export PATH="$PATH:/usr/local/bin" && aws sts get-caller-identity --query Account --output text', returnStdout:true).trim()
-        AWS_REGION="us-east-1"
-        ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-        TOKEN=sh(script:'export PATH="$PATH:/usr/local/bin" && aws ecr --region=us-east-1 get-authorization-token --output text --query authorizationData[].authorizationToken | base64 -d | cut -d: -f2', returnStdout:true)
-        SECRET_NAME="${AWS_ACCOUNT_ID}-ecr-registry"
-        ANSIBLE_PRIVATE_KEY_FILE="${WORKSPACE}/ec2_key_win.txt"
-        ANSIBLE_HOST_KEY_CHECKING="False"
+        PATH = sh(script:"echo $PATH:/usr/local/bin", returnStdout:true).trim()
+        APP_NAME = 'todo'
+        APP_STACK_NAME = "node-${APP_NAME}-app-${BUILD_NUMBER}"
+        APP_REPO_NAME = "case-repo/${APP_NAME}-app-dev"
+        AWS_ACCOUNT_ID = sh(script:'export PATH="$PATH:/usr/local/bin" && aws sts get-caller-identity --query Account --output text', returnStdout:true).trim()
+        AWS_REGION = 'us-east-1'
+        ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+        TOKEN = sh(script:'export PATH="$PATH:/usr/local/bin" && aws ecr --region=us-east-1 get-authorization-token --output text --query authorizationData[].authorizationToken | base64 -d | cut -d: -f2', returnStdout:true)
+        SECRET_NAME = "${AWS_ACCOUNT_ID}-ecr-registry"
+        ANSIBLE_PRIVATE_KEY_FILE = "${WORKSPACE}/ec2_key_win.txt"
+        ANSIBLE_HOST_KEY_CHECKING = 'False'
     }
     stages {
         // stage('Create ECR Repo') {
         //     steps {
         //         echo "Creating ECR Repo for ${APP_NAME} app"
-        //         sh """
+        //         sh 
         //         aws ecr create-repository \
         //             --repository-name ${APP_REPO_NAME} \
         //             --image-scanning-configuration scanOnPush=false \
         //             --image-tag-mutability MUTABLE \
         //             --region ${AWS_REGION}
-        //         """
+        //         
         //     }
         // }
 
@@ -31,9 +31,7 @@ pipeline {
             steps {
                 echo 'Preparing Tags for Docker Images'
                 script {
-
-                    env.IMAGE_TAG="${ECR_REGISTRY}/${APP_REPO_NAME}:todo-b${BUILD_NUMBER}"
-
+                    env.IMAGE_TAG = "${ECR_REGISTRY}/${APP_REPO_NAME}:todo-b${BUILD_NUMBER}"
                 }
             }
         }
@@ -52,32 +50,34 @@ pipeline {
             }
         }
 
-    stage('Ansible test kubernetes'){
+        stage('Test K8S CLUSTER') {
             steps {
-                echo 'PINGGGGGGGGGG'
-                    sh 'envsubst < ./k8s/deploy-1.yml > ./k8s/deploy-1-tagged.yml'
+                echo 'PING'
                     sh 'ansible-playbook -i ./ansible/inventory/dynamic_inv_aws_ec2.yml -b ./ansible/playbook/ping-all.yml'
-                    sh 'ansible-playbook -i ./ansible/inventory/dynamic_inv_aws_ec2.yml -b --extra-vars "workspace=${WORKSPACE} app_name=${APP_NAME} aws_region=${AWS_REGION} secret_name=${SECRET_NAME}  ecr_registry=${ECR_REGISTRY} token=${TOKEN} account=${AWS_ACCOUNT_ID} " ./ansible/playbook/deployment-k8s.yml'
-
 
             }
         }
+        stage('Deploy K8S') {
+            steps {
+                echo 'PING'
+                    sh 'envsubst < ./k8s/deploy-1.yml > ./k8s/deploy-1-tagged.yml'
+                    sh 'ansible-playbook -i ./ansible/inventory/dynamic_inv_aws_ec2.yml -b --extra-vars "workspace=${WORKSPACE} app_name=${APP_NAME} aws_region=${AWS_REGION} secret_name=${SECRET_NAME}  ecr_registry=${ECR_REGISTRY} token=${TOKEN} account=${AWS_ACCOUNT_ID} " ./ansible/playbook/deployment-k8s.yml'
 
-
+            }
+        }
     }
     post {
         always {
             echo 'Deleting all local images'
             sh 'docker image prune -af'
 
-            //  echo 'Delete the Image Repository on ECR'
-            // sh """
-            //     aws ecr delete-repository \
-            //       --repository-name ${APP_REPO_NAME} \
-            //       --region ${AWS_REGION}\
-            //       --force
-            //     """
-
+        //  echo 'Delete the Image Repository on ECR'
+        // sh """
+        //     aws ecr delete-repository \
+        //       --repository-name ${APP_REPO_NAME} \
+        //       --region ${AWS_REGION}\
+        //       --force
+        //     """
         }
     }
 }
