@@ -39,10 +39,13 @@ app.post("/removetask", function(req, res) {
 
 //render the ejs and display added task, completed task
 app.get("/", function(req, res) {
+    console.log("Hello world");
     res.render("index", { task: task, complete: complete });
+  
 });
 
 //set app to listen on port 3000
 app.listen(3000, function() {
     console.log("server is running on port 3000");
+    
 });
